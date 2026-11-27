@@ -28,6 +28,7 @@ $err = $_GET["err"] ?? "";
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agendar Cita — Reemplacamiento Yucatán</title>
     <link rel="stylesheet" href="../css/estilos.css">
 </head>
@@ -35,11 +36,11 @@ $err = $_GET["err"] ?? "";
     <header>
         <h1>Agendar Cita en Módulo</h1>
         <nav>
-            <a href="panel.php">Panel</a> |
-            <a href="vehiculos.php">Mis Vehículos</a> |
-            <a href="tramites.php">Solicitar Trámite</a> |
-            <a href="citas.php">Agendar Cita</a> |
-            <a href="seguimiento.php">Seguimiento</a> |
+            <a href="panel.php">Panel</a>
+            <a href="vehiculos.php">Mis Vehículos</a>
+            <a href="tramites.php">Solicitar Trámite</a>
+            <a href="citas.php" class="activo">Agendar Cita</a>
+            <a href="seguimiento.php">Seguimiento</a>
             <a href="../api/logout.php">Cerrar sesión</a>
         </nav>
     </header>
@@ -52,35 +53,44 @@ $err = $_GET["err"] ?? "";
             <p class="alerta-error"><?= htmlspecialchars($err, ENT_QUOTES, "UTF-8") ?></p>
         <?php endif; ?>
 
-        <form method="POST" action="../api/cita_agendar.php">
-            <label for="folio_tramite">Folio de trámite:</label>
-            <select id="folio_tramite" name="folio_tramite" required>
-                <option value="">Selecciona un trámite</option>
-                <?php foreach ($tramites as $t): ?>
-                    <option value="<?= htmlspecialchars($t["folio_tramite"], ENT_QUOTES, "UTF-8") ?>">
-                        <?= htmlspecialchars($t["folio_tramite"] . " (" . $t["placa_actual"] . " — " . $t["estado_tramite"] . ")", ENT_QUOTES, "UTF-8") ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+        <h2>Programar atención presencial</h2>
+        <?php if (empty($tramites)): ?>
+            <div class="estado-vacio">
+                <h3>No tienes trámites disponibles</h3>
+                <p>Antes de agendar una cita en módulo necesitas generar al menos una solicitud de trámite.</p>
+                <a href="tramites.php" class="btn-primario">Solicitar trámite →</a>
+            </div>
+        <?php else: ?>
+            <form method="POST" action="../api/cita_agendar.php">
+                <label for="folio_tramite">Folio de trámite:</label>
+                <select id="folio_tramite" name="folio_tramite" required>
+                    <option value="">Selecciona un trámite</option>
+                    <?php foreach ($tramites as $t): ?>
+                        <option value="<?= htmlspecialchars($t["folio_tramite"], ENT_QUOTES, "UTF-8") ?>">
+                            <?= htmlspecialchars($t["folio_tramite"] . " (" . $t["placa_actual"] . " — " . $t["estado_tramite"] . ")", ENT_QUOTES, "UTF-8") ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
 
-            <label for="id_modulo">Módulo de atención:</label>
-            <select id="id_modulo" name="id_modulo" required>
-                <option value="">Selecciona un módulo</option>
-                <?php foreach ($modulos as $mod): ?>
-                    <option value="<?= (int) $mod["id_modulo"] ?>">
-                        <?= htmlspecialchars($mod["municipio"] . " — " . $mod["nombre_modulo"], ENT_QUOTES, "UTF-8") ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+                <label for="id_modulo">Módulo de atención:</label>
+                <select id="id_modulo" name="id_modulo" required>
+                    <option value="">Selecciona un módulo</option>
+                    <?php foreach ($modulos as $mod): ?>
+                        <option value="<?= (int) $mod["id_modulo"] ?>">
+                            <?= htmlspecialchars($mod["municipio"] . " — " . $mod["nombre_modulo"], ENT_QUOTES, "UTF-8") ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
 
-            <label for="fecha_programada">Fecha:</label>
-            <input type="date" id="fecha_programada" name="fecha_programada" min="<?= date("Y-m-d") ?>" required>
+                <label for="fecha_programada">Fecha:</label>
+                <input type="date" id="fecha_programada" name="fecha_programada" min="<?= date("Y-m-d") ?>" required>
 
-            <label for="hora">Hora:</label>
-            <input type="time" id="hora" name="hora" required>
+                <label for="hora">Hora:</label>
+                <input type="time" id="hora" name="hora" required>
 
-            <button type="submit">Confirmar cita</button>
-        </form>
+                <button type="submit">Confirmar cita</button>
+            </form>
+        <?php endif; ?>
     </main>
 </body>
 </html>

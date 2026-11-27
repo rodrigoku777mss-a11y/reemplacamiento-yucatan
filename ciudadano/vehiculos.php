@@ -26,6 +26,7 @@ $err = $_GET["err"] ?? "";
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Vehículos — Reemplacamiento Yucatán</title>
     <link rel="stylesheet" href="../css/estilos.css">
 </head>
@@ -33,11 +34,11 @@ $err = $_GET["err"] ?? "";
     <header>
         <h1>Mis Vehículos</h1>
         <nav>
-            <a href="panel.php">Panel</a> |
-            <a href="vehiculos.php">Mis Vehículos</a> |
-            <a href="tramites.php">Solicitar Trámite</a> |
-            <a href="citas.php">Agendar Cita</a> |
-            <a href="seguimiento.php">Seguimiento</a> |
+            <a href="panel.php">Panel</a>
+            <a href="vehiculos.php" class="activo">Mis Vehículos</a>
+            <a href="tramites.php">Solicitar Trámite</a>
+            <a href="citas.php">Agendar Cita</a>
+            <a href="seguimiento.php">Seguimiento</a>
             <a href="../api/logout.php">Cerrar sesión</a>
         </nav>
     </header>
@@ -78,31 +79,40 @@ $err = $_GET["err"] ?? "";
         </form>
 
         <h2>Vehículos registrados</h2>
-        <table border="1" cellpadding="8" cellspacing="0">
-            <tr>
-                <th>Serie</th>
-                <th>Placa actual</th>
-                <th>Motor</th>
-                <th>Año</th>
-                <th>Modelo</th>
-                <th>Acción</th>
-            </tr>
-            <?php foreach ($vehiculos as $v): ?>
-                <tr>
-                    <td><?= htmlspecialchars($v["num_serie"], ENT_QUOTES, "UTF-8") ?></td>
-                    <td><?= htmlspecialchars($v["placa_actual"], ENT_QUOTES, "UTF-8") ?></td>
-                    <td><?= htmlspecialchars($v["num_motor"], ENT_QUOTES, "UTF-8") ?></td>
-                    <td><?= (int) $v["anio"] ?></td>
-                    <td><?= htmlspecialchars($v["marca"] . " " . $v["nombre_modelo"], ENT_QUOTES, "UTF-8") ?></td>
-                    <td>
-                        <form method="POST" action="../api/vehiculo_eliminar.php" style="display:inline;">
-                            <input type="hidden" name="num_serie" value="<?= htmlspecialchars($v["num_serie"], ENT_QUOTES, "UTF-8") ?>">
-                            <button type="submit">Dar de baja</button>
-                        </form>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
+        <?php if (empty($vehiculos)): ?>
+            <div class="estado-vacio">
+                <h3>Sin vehículos activos</h3>
+                <p>Completa el formulario superior para registrar tu primer vehículo y poder iniciar tus trámites.</p>
+            </div>
+        <?php else: ?>
+            <div class="tabla-contenedor">
+                <table>
+                    <tr>
+                        <th>Serie</th>
+                        <th>Placa actual</th>
+                        <th>Motor</th>
+                        <th>Año</th>
+                        <th>Modelo</th>
+                        <th>Acción</th>
+                    </tr>
+                    <?php foreach ($vehiculos as $v): ?>
+                        <tr>
+                            <td><small><?= htmlspecialchars($v["num_serie"], ENT_QUOTES, "UTF-8") ?></small></td>
+                            <td><strong><?= htmlspecialchars($v["placa_actual"], ENT_QUOTES, "UTF-8") ?></strong></td>
+                            <td><?= htmlspecialchars($v["num_motor"], ENT_QUOTES, "UTF-8") ?></td>
+                            <td><?= (int) $v["anio"] ?></td>
+                            <td><?= htmlspecialchars($v["marca"] . " " . $v["nombre_modelo"], ENT_QUOTES, "UTF-8") ?></td>
+                            <td>
+                                <form method="POST" action="../api/vehiculo_eliminar.php">
+                                    <input type="hidden" name="num_serie" value="<?= htmlspecialchars($v["num_serie"], ENT_QUOTES, "UTF-8") ?>">
+                                    <button type="submit">Dar de baja</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            </div>
+        <?php endif; ?>
     </main>
 </body>
 </html>
